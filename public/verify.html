@@ -18,6 +18,7 @@
   <h1>TraceChain pair verification</h1>
   <p>Item ID: <code id="item-id"></code></p>
   <p id="status" data-state="loading">Checking…</p>
+  <p><button id="recheck" type="button">Check again</button></p>
   <p class="muted">“Verified” means the record history checks out: the details below are exactly the details that were
     registered on the blockchain, unchanged since registration. It does <strong>not</strong> prove that the physical pair in
     front of you is genuine.</p>
@@ -40,7 +41,8 @@
   <script src="/vendor/ethers.umd.min.js"></script>
   <script src="/static/verify-hash.js"></script>
   <script>
-  (async function () {
+  async function runVerification() {
+    document.body.removeAttribute('data-done');
     var t0 = performance.now();
     var itemId = decodeURIComponent(location.pathname.split('/').pop());
     document.getElementById('item-id').textContent = itemId;
@@ -104,7 +106,15 @@
     // 4. Compare.
     if (TraceChainVerify.hashesEqual(computed, onchain.detailsHash)) setStatus('Verified', 'verified');
     else setStatus('Not verified', 'not-verified');
-  })();
+  }
+  document.getElementById('recheck').addEventListener('click', function () {
+    ['computed-hash', 'onchain-hash', 'onchain-producer', 'onchain-time', 'record-status', 'verify-ms'].forEach(function (id) { document.getElementById(id).textContent = '–'; });
+    document.getElementById('error').textContent = '';
+    document.getElementById('status').textContent = 'Checking…';
+    document.getElementById('status').setAttribute('data-state', 'loading');
+    runVerification();
+  });
+  runVerification();
   </script>
 </body>
 </html>

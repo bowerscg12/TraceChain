@@ -5,6 +5,7 @@ const { makePool } = require('../db/pool');
 const { createApp } = require('./app');
 
 const pool = makePool();
+pool.on('error', (e) => console.error('pg pool idle client error:', e.message));
 const port = Number(process.env.API_PORT || 3000);
 const app = createApp({ pool });
 const server = app.listen(port, '127.0.0.1', () => {
