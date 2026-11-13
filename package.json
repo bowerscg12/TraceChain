@@ -1,0 +1,33 @@
+{
+  "name": "tracechain-spike",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TraceChain hash-consistency technical spike (Caleb Bowers, JMU IT 444 Team 6)",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "db:migrate": "node db/migrate.js",
+    "db:seed": "node db/seed.js",
+    "db:reset": "node db/reset.js",
+    "chain:node": "hardhat node",
+    "chain:compile": "hardhat compile",
+    "chain:deploy": "node chain/deploy.js",
+    "api": "node src/server.js",
+    "data:generate": "node data/generate.js",
+    "hash:selftest": "node src/hash.selftest.js",
+    "spike": "node spike/run.js"
+  },
+  "dependencies": {
+    "dotenv": "16.4.7",
+    "ethers": "6.13.5",
+    "express": "4.21.2",
+    "pg": "8.13.3"
+  },
+  "devDependencies": {
+    "hardhat": "2.22.19",
+    "playwright": "1.63.0",
+    "solc": "0.8.28"
+  }
+}
