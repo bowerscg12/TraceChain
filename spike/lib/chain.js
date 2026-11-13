@@ -6,6 +6,7 @@ const { deploy } = require('../../chain/deploy');
 
 function chainClient(rpcUrl) {
   const provider = new ethers.JsonRpcProvider(rpcUrl, 31337, { staticNetwork: true });
+  provider.pollingInterval = 100; // default 4000 ms made each tx.wait() take ~4 s on an instant-mining local node
   let deployment = null;
   const wallets = new Map();
   for (const a of Object.values(accounts)) wallets.set(a.address.toLowerCase(), new ethers.Wallet(a.key, provider));
