@@ -116,7 +116,7 @@ stopping the Hardhat node discards chain state.
 
 - `results/2026-11-13_00-19-21Z/` — Test 1, UTC only (first run, slow receipt polling).
 - `results/2026-11-13_00-27-01Z/` — first full run, all pass marks met.
-- The final run named in the README results section — re-run after the last harness changes, from a clean compile.
+- `results/2026-11-13_00-32-00Z/` — final run after the last harness changes, from a clean compile (this is the run in the README results section).
 - Each run folder: `summary.csv`, `summary.json` (every case with expected vs actual and per-record hashes),
   `environment.txt`, `api-*.log` (one per API process incarnation, every request with status and duration),
   `hardhat-node.log`, `console.log`, `screenshots/` (verified, not-verified-tampered, pending-confirmation,

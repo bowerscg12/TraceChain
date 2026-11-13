@@ -1,0 +1,2 @@
+API listening on http://127.0.0.1:3000 pid=2686 TZ=America/New_York
+API received SIGTERM, shutting down
