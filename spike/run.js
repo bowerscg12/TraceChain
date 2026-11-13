@@ -24,8 +24,17 @@ const PORT = Number(process.env.API_PORT || 3000);
 const RPC = process.env.RPC_URL || 'http://127.0.0.1:8545';
 const BASE = `http://127.0.0.1:${PORT}`;
 
+function ensureCompiled() {
+  const artifact = path.join(ROOT, 'artifacts', 'contracts', 'TraceChainStub.sol', 'TraceChainStub.json');
+  if (fs.existsSync(artifact)) return;
+  log('compiling TraceChainStub.sol (artifact missing)');
+  const r = require('node:child_process').spawnSync(process.execPath, [require.resolve('hardhat/internal/cli/cli.js'), 'compile'], { cwd: ROOT, stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('hardhat compile failed');
+}
+
 async function main() {
   const startedAt = new Date();
+  ensureCompiled();
   const runDir = path.join(ROOT, 'results', startedAt.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 19) + 'Z');
   const screenshotsDir = path.join(runDir, 'screenshots');
   fs.mkdirSync(screenshotsDir, { recursive: true });

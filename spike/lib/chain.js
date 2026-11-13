@@ -21,7 +21,12 @@ function chainClient(rpcUrl) {
         const tx = await contractFor(producerAddress).register(ethers.encodeBytes32String(itemId), detailsHash);
         const receipt = await tx.wait();
         return { ok: receipt.status === 1, receipt };
-      } catch (e) { return { ok: false, error: e.shortMessage || e.message, code: e.code }; }
+      } catch (e) {
+        // ethers 6.13 reports Hardhat custom-error reverts as "unknown custom error"; decode the selector ourselves.
+        let error = e.shortMessage || e.message;
+        try { const parsed = new ethers.Interface(deployment.abi).parseError(e.data); if (parsed) error = `reverted with ${parsed.signature}`; } catch { /* keep generic message */ }
+        return { ok: false, error, code: e.code };
+      }
     },
     async read(itemId) {
       const c = new ethers.Contract(deployment.address, deployment.abi, provider);

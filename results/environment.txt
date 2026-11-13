@@ -1,5 +1,5 @@
 TraceChain spike environment report
-generated: 2026-11-13T00:19:22.350Z
+generated: 2026-11-13T00:31:36.672Z
 
 NOTE: The spike brief assumed a Windows 11 laptop with tools installed via winget. This run executed in a
 Linux cloud container (no winget). Git, Node.js LTS, GitHub CLI, native PostgreSQL 16 (not Docker) and
@@ -31,4 +31,4 @@ pinned npm packages (package.json, exact versions):
 
 solidity compiler: solc-js 0.8.28 from npm (binaries.soliditylang.org is blocked by the container proxy,
   so Hardhat is configured to use the npm solc package instead of downloading a native compiler).
-run directory: results/2026-11-13_00-19-21Z
+run directory: results/2026-11-13_00-31-36Z

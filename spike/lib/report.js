@@ -79,7 +79,15 @@ class Report {
     if (unc.length) {
       out.push(''); out.push('Checks outside the counted groups (recorded, not part of a pass mark):'); out.push('');
       out.push('| Test | Case | Expected | Actual | OK |'); out.push('|---|---|---|---|---|');
-      for (const c of unc) out.push(`| ${c.test} ${c.group} | ${c.caseId} | ${String(c.expected).replace(/\|/g, '\\|')} | ${String(c.actual).replace(/\|/g, '\\|')} | ${c.pass ? 'yes' : 'NO'} |`);
+      const md = (v) => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+      const groups = new Map();
+      for (const c of unc) { const k = `${c.test} ${c.group}`; (groups.get(k) || groups.set(k, []).get(k)).push(c); }
+      for (const [k, cs] of groups) {
+        if (cs.length > 12) { // large uniform groups are summarized in one row
+          const ok = cs.filter((c) => c.pass).length;
+          out.push(`| ${k} | ${cs.length} cases | ${md(cs[0].expected)} | ${ok} of ${cs.length} as expected | ${ok === cs.length ? 'yes' : 'NO'} |`);
+        } else for (const c of cs) out.push(`| ${k} | ${md(c.caseId)} | ${md(c.expected)} | ${md(c.actual)} | ${c.pass ? 'yes' : 'NO'} |`);
+      }
     }
     const t = this.summaryJson().timings;
     if (Object.keys(t).length) {
@@ -92,4 +100,26 @@ class Report {
   }
 }
 
+/** Rebuild a Report from a run folder's summary.json (to re-render tables without re-running). */
+Report.fromRunDir = function fromRunDir(runDir) {
+  const json = JSON.parse(fs.readFileSync(path.join(runDir, 'summary.json'), 'utf8'));
+  const r = new Report(runDir, json.meta);
+  r.cases = json.cases; r.notes = json.notes || [];
+  r.marks = json.marks.map(({ label, test, group, required, kind }) => ({ label, test, group, required, kind }));
+  r.timings = {}; r._timings = json.timings; // stats already computed
+  r.summaryJson = function () { return { meta: this.meta, marks: this.evaluateMarks(), timings: this._timings, notes: this.notes, cases: this.cases }; };
+  return r;
+};
+
 module.exports = { Report, stats };
+
+if (require.main === module) {
+  // node spike/lib/report.js results/<run>  -> rewrites results-table.md and the README results section
+  const runDir = path.resolve(process.argv[2]);
+  const r = Report.fromRunDir(runDir);
+  fs.writeFileSync(path.join(runDir, 'results-table.md'), r.markdown());
+  const readme = path.join(__dirname, '..', '..', 'README.md');
+  const s = fs.readFileSync(readme, 'utf8'); const a = '<!-- RESULTS:START -->'; const b = '<!-- RESULTS:END -->';
+  fs.writeFileSync(readme, s.slice(0, s.indexOf(a) + a.length) + '\n' + r.markdown() + s.slice(s.indexOf(b)));
+  process.stdout.write(r.consoleTable() + '\n');
+}

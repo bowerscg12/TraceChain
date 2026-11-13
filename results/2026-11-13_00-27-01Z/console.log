@@ -1,0 +1,53 @@
+2026-11-13T00:27:01.341Z TraceChain spike run 2026-11-13_00-27-01Z  timezones=UTC,America/New_York,Asia/Tokyo tests=1,2,3
+2026-11-13T00:27:01.702Z   database reset (dropped, recreated, migrated)
+2026-11-13T00:27:02.180Z   started hardhat node pid=1742
+2026-11-13T00:27:14.720Z   deployed TraceChainStub at 0x5FbDB2315678afecb367f032d93F642f64180aa3 (chainId 31337)
+2026-11-13T00:27:14.899Z   started API pid=1764 TZ=UTC log=results/2026-11-13_00-27-01Z/api-UTC-1.log
+2026-11-13T00:27:14.949Z 
+== Test 1 — Consistency, API TZ=UTC, browser timezoneId=UTC (browser reports UTC)
+2026-11-13T00:27:43.602Z   registered 100 records through POST -> chain -> PATCH confirm
+2026-11-13T00:27:54.145Z   restarting API process for check (e)
+2026-11-13T00:27:54.152Z   stopped API pid=1764
+2026-11-13T00:27:54.279Z   started API pid=1793 TZ=UTC log=results/2026-11-13_00-27-01Z/api-UTC-restarted-2.log
+2026-11-13T00:27:54.435Z   Test 1 (UTC): 100 of 100 records consistent
+2026-11-13T00:27:54.444Z   stopped API pid=1793
+2026-11-13T00:27:54.473Z   stopped hardhat node pid=1742
+2026-11-13T00:27:54.543Z   database reset (dropped, recreated, migrated)
+2026-11-13T00:27:54.984Z   started hardhat node pid=1807
+2026-11-13T00:28:07.512Z   deployed TraceChainStub at 0x5FbDB2315678afecb367f032d93F642f64180aa3 (chainId 31337)
+2026-11-13T00:28:07.643Z   started API pid=1878 TZ=America/New_York log=results/2026-11-13_00-27-01Z/api-America-New_York-3.log
+2026-11-13T00:28:07.703Z 
+== Test 1 — Consistency, API TZ=America/New_York, browser timezoneId=America/New_York (browser reports America/New_York)
+2026-11-13T00:28:35.936Z   registered 100 records through POST -> chain -> PATCH confirm
+2026-11-13T00:28:45.865Z   restarting API process for check (e)
+2026-11-13T00:28:45.872Z   stopped API pid=1878
+2026-11-13T00:28:46.003Z   started API pid=1945 TZ=America/New_York log=results/2026-11-13_00-27-01Z/api-America-New_York-restarted-4.log
+2026-11-13T00:28:46.149Z   Test 1 (America/New_York): 100 of 100 records consistent
+2026-11-13T00:28:46.161Z   stopped API pid=1945
+2026-11-13T00:28:46.188Z   stopped hardhat node pid=1807
+2026-11-13T00:28:46.256Z   database reset (dropped, recreated, migrated)
+2026-11-13T00:28:46.691Z   started hardhat node pid=1959
+2026-11-13T00:28:59.207Z   deployed TraceChainStub at 0x5FbDB2315678afecb367f032d93F642f64180aa3 (chainId 31337)
+2026-11-13T00:28:59.339Z   started API pid=1994 TZ=Asia/Tokyo log=results/2026-11-13_00-27-01Z/api-Asia-Tokyo-5.log
+2026-11-13T00:28:59.391Z 
+== Test 1 — Consistency, API TZ=Asia/Tokyo, browser timezoneId=Asia/Tokyo (browser reports Asia/Tokyo)
+2026-11-13T00:29:27.549Z   registered 100 records through POST -> chain -> PATCH confirm
+2026-11-13T00:29:37.506Z   restarting API process for check (e)
+2026-11-13T00:29:37.514Z   stopped API pid=1994
+2026-11-13T00:29:37.640Z   started API pid=2062 TZ=Asia/Tokyo log=results/2026-11-13_00-27-01Z/api-Asia-Tokyo-restarted-6.log
+2026-11-13T00:29:37.770Z   Test 1 (Asia/Tokyo): 100 of 100 records consistent
+2026-11-13T00:29:37.777Z 
+== Test 2 — Tamper detection (direct SQL UPDATE, bypassing the API)
+2026-11-13T00:29:55.986Z   180 single-field edits done
+2026-11-13T00:29:58.475Z   tamper cases detected: 200 of 200
+2026-11-13T00:29:58.476Z   whitespace-only edits (informational)
+2026-11-13T00:29:59.109Z   sweeping all 100 records for false alarms
+2026-11-13T00:30:12.218Z   false alarms: 0 of 100
+2026-11-13T00:30:12.227Z 
+== Test 3 — Validation and API behavior
+2026-11-13T00:30:12.259Z   400 group: 10 of 10
+2026-11-13T00:30:12.338Z   409 group: 10 of 10
+2026-11-13T00:30:12.740Z   stopped API pid=2062
+2026-11-13T00:30:12.976Z   started API pid=2127 TZ=Asia/Tokyo log=results/2026-11-13_00-27-01Z/api-after-api-stop-check-7.log
+2026-11-13T00:30:13.225Z   stopped hardhat node pid=1959
+2026-11-13T00:30:13.499Z   stopped API pid=2127
