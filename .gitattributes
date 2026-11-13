@@ -1,0 +1,11 @@
+# Force LF line endings for all text/source files so hashes and diffs are identical on Windows, macOS and Linux.
+* text=auto eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+*.sol text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.csv text eol=lf
+*.txt text eol=lf
+*.png binary
