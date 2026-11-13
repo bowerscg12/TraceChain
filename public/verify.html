@@ -1,1 +1,110 @@
-<!doctype html><title>placeholder</title>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TraceChain – Verify pair</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.4; }
+    #status { font-size: 1.5rem; font-weight: bold; padding: .5rem .75rem; border: 2px solid #999; display: inline-block; }
+    #status[data-state="verified"] { border-color: #2e7d32; color: #2e7d32; }
+    #status[data-state="not-verified"] { border-color: #c62828; color: #c62828; }
+    table { border-collapse: collapse; margin-top: 1rem; } td, th { border: 1px solid #ccc; padding: .25rem .5rem; text-align: left; vertical-align: top; word-break: break-all; }
+    code { font-size: .85em; }
+    .muted { color: #555; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>TraceChain pair verification</h1>
+  <p>Item ID: <code id="item-id"></code></p>
+  <p id="status" data-state="loading">Checking…</p>
+  <p class="muted">“Verified” means the record history checks out: the details below are exactly the details that were
+    registered on the blockchain, unchanged since registration. It does <strong>not</strong> prove that the physical pair in
+    front of you is genuine.</p>
+
+  <table id="details" hidden>
+    <tbody></tbody>
+  </table>
+
+  <h2>Technical detail</h2>
+  <table>
+    <tr><th>Hash computed in this browser</th><td><code id="computed-hash">–</code></td></tr>
+    <tr><th>Hash stored on-chain</th><td><code id="onchain-hash">–</code></td></tr>
+    <tr><th>Registered on-chain by</th><td><code id="onchain-producer">–</code></td></tr>
+    <tr><th>Registered at (block time)</th><td><code id="onchain-time">–</code></td></tr>
+    <tr><th>Record status (off-chain)</th><td><code id="record-status">–</code></td></tr>
+    <tr><th>Page verify time</th><td><code id="verify-ms">–</code></td></tr>
+  </table>
+  <p id="error" class="muted"></p>
+
+  <script src="/vendor/ethers.umd.min.js"></script>
+  <script src="/static/verify-hash.js"></script>
+  <script>
+  (async function () {
+    var t0 = performance.now();
+    var itemId = decodeURIComponent(location.pathname.split('/').pop());
+    document.getElementById('item-id').textContent = itemId;
+    var statusEl = document.getElementById('status');
+    var errEl = document.getElementById('error');
+    function setStatus(text, state) { statusEl.textContent = text; statusEl.setAttribute('data-state', state); document.body.setAttribute('data-done', '1'); document.getElementById('verify-ms').textContent = (performance.now() - t0).toFixed(1) + ' ms'; }
+    function showDetails(d) {
+      var tb = document.querySelector('#details tbody'); tb.innerHTML = '';
+      TraceChainVerify.FIELD_ORDER.forEach(function (f) {
+        var tr = document.createElement('tr'); var th = document.createElement('th'); var td = document.createElement('td');
+        th.textContent = f; td.textContent = d[f]; tr.appendChild(th); tr.appendChild(td); tb.appendChild(tr);
+      });
+      document.getElementById('details').hidden = false;
+      document.getElementById('record-status').textContent = d.status;
+    }
+
+    // 1. Off-chain details from the API (public, no account).
+    var details;
+    try {
+      var res = await fetch('/items/' + encodeURIComponent(itemId), { cache: 'no-store' });
+      if (res.status === 404) { setStatus('No record found for item ID ' + itemId + '.', 'not-found'); return; }
+      if (!res.ok) throw new Error('API returned HTTP ' + res.status);
+      details = await res.json();
+    } catch (e) {
+      errEl.textContent = 'API error: ' + e.message;
+      setStatus("Can't verify right now, try again later.", 'unavailable'); return;
+    }
+    showDetails(details);
+
+    if (details.status === 'pending') { setStatus('Pending confirmation', 'pending'); return; }
+
+    // 2. Hash computed here, in the browser, from the served details (independent implementation).
+    var computed;
+    try {
+      computed = await TraceChainVerify.computeDetailsHash(details);
+      document.getElementById('computed-hash').textContent = computed;
+    } catch (e) {
+      errEl.textContent = 'Hashing error: ' + e.message;
+      setStatus('Not verified', 'not-verified'); return;
+    }
+
+    // 3. On-chain record straight from the RPC node (not via the API).
+    var onchain;
+    try {
+      var cfgRes = await fetch('/config', { cache: 'no-store' });
+      if (!cfgRes.ok) throw new Error('config HTTP ' + cfgRes.status);
+      var cfg = await cfgRes.json();
+      var provider = new ethers.JsonRpcProvider(cfg.rpcUrl, cfg.chainId, { staticNetwork: true });
+      var contract = new ethers.Contract(cfg.contractAddress, cfg.abi, provider);
+      var rec = await contract.getItem(ethers.encodeBytes32String(itemId));
+      onchain = { detailsHash: rec[0], producer: rec[1], registeredAt: Number(rec[2]), exists: rec[4] };
+    } catch (e) {
+      errEl.textContent = 'Blockchain RPC error: ' + (e.shortMessage || e.message);
+      setStatus("Can't verify right now, try again later.", 'unavailable'); return;
+    }
+    if (!onchain.exists) { setStatus('No record found on the blockchain for item ID ' + itemId + '.', 'not-found'); return; }
+    document.getElementById('onchain-hash').textContent = onchain.detailsHash;
+    document.getElementById('onchain-producer').textContent = onchain.producer;
+    document.getElementById('onchain-time').textContent = new Date(onchain.registeredAt * 1000).toISOString();
+
+    // 4. Compare.
+    if (TraceChainVerify.hashesEqual(computed, onchain.detailsHash)) setStatus('Verified', 'verified');
+    else setStatus('Not verified', 'not-verified');
+  })();
+  </script>
+</body>
+</html>
