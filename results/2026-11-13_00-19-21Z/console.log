@@ -1,0 +1,14 @@
+2026-11-13T00:19:21.865Z TraceChain spike run 2026-11-13_00-19-21Z  timezones=UTC tests=1
+2026-11-13T00:19:22.709Z   database reset (dropped, recreated, migrated)
+2026-11-13T00:19:23.200Z   started hardhat node pid=1414
+2026-11-13T00:19:35.733Z   deployed TraceChainStub at 0x5FbDB2315678afecb367f032d93F642f64180aa3 (chainId 31337)
+2026-11-13T00:19:35.875Z   started API pid=1436 TZ=UTC log=results/2026-11-13_00-19-21Z/api-UTC-1.log
+2026-11-13T00:19:36.011Z 
+== Test 1 — Consistency, API TZ=UTC, browser timezoneId=UTC (browser reports UTC)
+2026-11-13T00:26:25.447Z   registered 100 records through POST -> chain -> PATCH confirm
+2026-11-13T00:26:35.655Z   restarting API process for check (e)
+2026-11-13T00:26:35.663Z   stopped API pid=1436
+2026-11-13T00:26:35.842Z   started API pid=1548 TZ=UTC log=results/2026-11-13_00-19-21Z/api-UTC-restarted-2.log
+2026-11-13T00:26:35.971Z   Test 1 (UTC): 100 of 100 records consistent
+2026-11-13T00:26:36.028Z   stopped API pid=1548
+2026-11-13T00:26:36.048Z   stopped hardhat node pid=1414
